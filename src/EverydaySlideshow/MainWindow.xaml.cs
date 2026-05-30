@@ -175,8 +175,7 @@ public partial class MainWindow : Window
         ApplyTheme();
         Topmost = _viewModel.DisplaySettings.Topmost;
         Opacity = _viewModel.DisplaySettings.Opacity;
-        ShowInTaskbar = !(mode == DisplayModeKind.Borderless
-                          && _viewModel.DisplaySettings.HideFromTaskbarInQuietMode);
+        ShowInTaskbar = true;
 
         var screen = Forms.Screen.AllScreens.FirstOrDefault(candidate =>
                          string.Equals(candidate.DeviceName, _viewModel.DisplaySettings.MonitorDeviceName, StringComparison.OrdinalIgnoreCase))

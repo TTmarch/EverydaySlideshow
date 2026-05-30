@@ -127,7 +127,6 @@ public sealed class DisplaySettings
     public bool Topmost { get; set; }
     public double Opacity { get; set; } = 1.0;
     public string? MonitorDeviceName { get; set; }
-    public bool HideFromTaskbarInQuietMode { get; set; }
     public bool AutoStartWithWindows { get; set; }
     public bool IdleAutoPlay { get; set; }
     public int IdleAutoPlayMinutes { get; set; } = 10;

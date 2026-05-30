@@ -708,23 +708,6 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    public bool HideFromTaskbarInQuietMode
-    {
-        get => DisplaySettings.HideFromTaskbarInQuietMode;
-        set
-        {
-            if (DisplaySettings.HideFromTaskbarInQuietMode == value)
-            {
-                return;
-            }
-
-            DisplaySettings.HideFromTaskbarInQuietMode = value;
-            OnPropertyChanged();
-            DisplaySettingsChanged?.Invoke();
-            _ = SaveSettingsAsync();
-        }
-    }
-
     public string? SelectedMonitorDeviceName
     {
         get => DisplaySettings.MonitorDeviceName;
@@ -1945,7 +1928,6 @@ public sealed class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(AutoStartWithWindows));
         OnPropertyChanged(nameof(IdleAutoPlay));
         OnPropertyChanged(nameof(IdleAutoPlayMinutes));
-        OnPropertyChanged(nameof(HideFromTaskbarInQuietMode));
         OnPropertyChanged(nameof(SelectedMonitorDeviceName));
         OnPropertyChanged(nameof(CustomSecondsText));
         RaiseLanguagePropertiesChanged();

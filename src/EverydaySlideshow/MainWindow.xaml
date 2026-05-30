@@ -574,8 +574,6 @@
                                                Foreground="{DynamicResource MutedTextBrush}"
                                                VerticalAlignment="Center" />
                                 </StackPanel>
-                                <CheckBox Content="{Binding Text[HideFromTaskbarQuiet]}"
-                                          IsChecked="{Binding HideFromTaskbarInQuietMode}" />
                                 <TextBlock Text="{Binding Text[Brightness]}"
                                            Foreground="{DynamicResource MutedTextBrush}"
                                            Margin="0,8,0,0" />
