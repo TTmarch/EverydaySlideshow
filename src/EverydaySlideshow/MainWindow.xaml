@@ -1,0 +1,761 @@
+<Window x:Class="EverydaySlideshow.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:EverydaySlideshow.Converters"
+        xmlns:core="clr-namespace:EverydaySlideshow.Core;assembly=EverydaySlideshow.Core"
+        Title="{Binding Text[AppTitle]}"
+        Icon="Assets/app.ico"
+        Width="1240"
+        Height="760"
+        MinWidth="640"
+        MinHeight="420"
+        Background="{DynamicResource PageBrush}"
+        Foreground="{DynamicResource TextBrush}"
+        Opacity="{Binding WindowOpacity}"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        MouseMove="Window_MouseMove">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
+        <conv:NullToVisibilityConverter x:Key="NullToVis" />
+        <conv:CurrentMediaVisibilityConverter x:Key="CurrentMediaVisibility" />
+        <conv:FitModeToStretchConverter x:Key="FitModeToStretch" />
+        <conv:FavoriteGlyphConverter x:Key="FavoriteGlyph" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid Visibility="{Binding IsHomeVisible, Converter={StaticResource BoolToVis}}">
+            <DockPanel LastChildFill="True">
+                <Menu DockPanel.Dock="Top"
+                      Background="{DynamicResource MenuBrush}"
+                      BorderBrush="{DynamicResource ChromeBorderBrush}"
+                      BorderThickness="0,0,0,1"
+                      Padding="2,0">
+                    <MenuItem Header="{Binding Text[MenuFile]}">
+                        <MenuItem Header="{Binding Text[AddFolder]}"
+                                  Command="{Binding AddFolderCommand}" />
+                        <MenuItem Header="{Binding Text[ReloadAll]}"
+                                  Command="{Binding ScanAllCommand}" />
+                        <MenuItem Header="{Binding Text[CreatePlaylist]}"
+                                  Command="{Binding CreatePlaylistCommand}" />
+                        <Separator />
+                        <MenuItem Header="{Binding Text[MoveDeleteCandidatesToRecycleBin]}"
+                                  Command="{Binding PurgeDeleteCandidatesCommand}" />
+                        <Separator />
+                        <MenuItem Header="{Binding Text[ResetHidden]}"
+                                  Command="{Binding ResetHiddenCommand}" />
+                        <MenuItem Header="{Binding Text[ResetDeleteCandidates]}"
+                                  Command="{Binding ResetDeleteCandidatesCommand}" />
+                        <Separator />
+                        <MenuItem Header="{Binding Text[Exit]}"
+                                  Click="ExitMenuItem_Click" />
+                    </MenuItem>
+
+                    <MenuItem Header="{Binding Text[MenuPlay]}">
+                        <MenuItem Header="{Binding Text[PlayAll]}"
+                                  Command="{Binding PlayAllCommand}" />
+                        <MenuItem Header="{Binding Text[ResumePrevious]}"
+                                  Command="{Binding PlayAllCommand}" />
+                        <MenuItem Header="{Binding Text[FavoritesOnly]}"
+                                  Command="{Binding PlayFavoritesCommand}" />
+                        <MenuItem Header="{Binding Text[WatchLater]}"
+                                  Command="{Binding PlayWatchLaterCommand}" />
+                        <MenuItem Header="{Binding Text[RecentlyUnseen]}"
+                                  Command="{Binding PlayRecentlyUnseenCommand}" />
+                        <Separator />
+                        <MenuItem Header="{Binding Text[RegisteredFolders]}"
+                                  IsEnabled="{Binding HasFolders}"
+                                  ItemsSource="{Binding FolderMenuItems}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                    <Setter Property="Header" Value="{Binding Header}" />
+                                    <Setter Property="Command" Value="{Binding Command}" />
+                                    <Setter Property="CommandParameter" Value="{Binding Parameter}" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <MenuItem Header="{Binding Text[Playlists]}"
+                                  IsEnabled="{Binding HasPlaylists}"
+                                  ItemsSource="{Binding PlaylistMenuItems}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                    <Setter Property="Header" Value="{Binding Header}" />
+                                    <Setter Property="Command" Value="{Binding Command}" />
+                                    <Setter Property="CommandParameter" Value="{Binding Parameter}" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                    </MenuItem>
+
+                    <MenuItem Header="{Binding Text[MenuMood]}">
+                        <MenuItem Header="{Binding Text[MoodDefault]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsDefaultMoodSelected, Mode=OneWay}"
+                                  Command="{Binding ApplyMoodCommand}"
+                                  CommandParameter="Default" />
+                        <MenuItem Header="{Binding Text[MoodWork]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsWorkMoodSelected, Mode=OneWay}"
+                                  Command="{Binding ApplyMoodCommand}"
+                                  CommandParameter="Work" />
+                        <MenuItem Header="{Binding Text[MoodBedtime]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsBedtimeMoodSelected, Mode=OneWay}"
+                                  Command="{Binding ApplyMoodCommand}"
+                                  CommandParameter="Bedtime" />
+                        <MenuItem Header="{Binding Text[MoodSafe]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsFamilySafeMoodSelected, Mode=OneWay}"
+                                  Command="{Binding ApplyMoodCommand}"
+                                  CommandParameter="FamilySafe" />
+                        <Separator />
+                        <MenuItem Header="{Binding Text[CreateCustom]}"
+                                  Command="{Binding CreateCustomMoodCommand}" />
+                        <MenuItem Header="{Binding Text[Custom]}"
+                                  IsEnabled="{Binding HasCustomMoodProfiles}"
+                                  ItemsSource="{Binding CustomMoodMenuItems}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                    <Setter Property="Header" Value="{Binding Header}" />
+                                    <Setter Property="IsCheckable" Value="True" />
+                                    <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=OneWay}" />
+                                    <Setter Property="Command" Value="{Binding Command}" />
+                                    <Setter Property="CommandParameter" Value="{Binding Parameter}" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                    </MenuItem>
+
+                    <MenuItem Header="{Binding Text[MenuView]}">
+                        <MenuItem Header="{Binding Text[WindowMode]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsWindowMode, Mode=OneWay}"
+                                  Command="{Binding SetWindowModeCommand}" />
+                        <MenuItem Header="{Binding Text[Fullscreen]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsFullscreenMode, Mode=OneWay}"
+                                  Command="{Binding ToggleFullscreenCommand}" />
+                        <MenuItem Header="{Binding Text[BorderlessWindow]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsBorderlessMode, Mode=OneWay}"
+                                  Command="{Binding ToggleBorderlessCommand}" />
+                        <MenuItem Header="{Binding Text[StartFullscreen]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding StartSlideshowFullscreen, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <MenuItem Header="{Binding Text[Topmost]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding TopmostMode, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <MenuItem Header="{Binding Text[DarkMode]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding DarkMode, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <Separator />
+                        <MenuItem Header="{Binding Text[FitMode]}">
+                            <MenuItem Header="{Binding Text[Fit]}"
+                                      IsCheckable="True"
+                                      IsChecked="{Binding IsFitModeFit, Mode=OneWay}"
+                                      Command="{Binding SetFitModeCommand}"
+                                      CommandParameter="{x:Static core:FitMode.Fit}" />
+                            <MenuItem Header="{Binding Text[Fill]}"
+                                      IsCheckable="True"
+                                      IsChecked="{Binding IsFitModeFill, Mode=OneWay}"
+                                      Command="{Binding SetFitModeCommand}"
+                                      CommandParameter="{x:Static core:FitMode.Fill}" />
+                            <MenuItem Header="{Binding Text[Original]}"
+                                      IsCheckable="True"
+                                      IsChecked="{Binding IsFitModeOriginal, Mode=OneWay}"
+                                      Command="{Binding SetFitModeCommand}"
+                                      CommandParameter="{x:Static core:FitMode.Original}" />
+                            <MenuItem Header="{Binding Text[BlurBackground]}"
+                                      IsCheckable="True"
+                                      IsChecked="{Binding IsFitModeBlurBackground, Mode=OneWay}"
+                                      Command="{Binding SetFitModeCommand}"
+                                      CommandParameter="{x:Static core:FitMode.BlurBackground}" />
+                        </MenuItem>
+                        <MenuItem Header="{Binding Text[Monitor]}"
+                                  IsEnabled="{Binding HasMonitors}"
+                                  ItemsSource="{Binding MonitorMenuItems}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                    <Setter Property="Header" Value="{Binding Header}" />
+                                    <Setter Property="Command" Value="{Binding Command}" />
+                                    <Setter Property="CommandParameter" Value="{Binding Parameter}" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                    </MenuItem>
+
+                    <MenuItem Header="{Binding Text[MenuLanguage]}">
+                        <MenuItem Header="{Binding Text[LanguageEnglish]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsEnglishLanguage, Mode=OneWay}"
+                                  Command="{Binding SetLanguageCommand}"
+                                  CommandParameter="{x:Static core:AppLanguage.English}" />
+                        <MenuItem Header="{Binding Text[LanguageJapanese]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IsJapaneseLanguage, Mode=OneWay}"
+                                  Command="{Binding SetLanguageCommand}"
+                                  CommandParameter="{x:Static core:AppLanguage.Japanese}" />
+                    </MenuItem>
+
+                    <MenuItem Header="{Binding Text[MenuSettings]}">
+                        <MenuItem Header="{Binding Text[SmartShuffle]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding UseSmartShuffle, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <MenuItem Header="{Binding Text[Loop]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding Loop, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <MenuItem Header="{Binding Text[PauseEachPhoto]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding PauseEachPhoto, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <Separator />
+                        <MenuItem Header="{Binding Text[IncludeVideos]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IncludeVideos, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <MenuItem Header="{Binding Text[MuteVideo]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding MuteVideo, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <MenuItem Header="{Binding Text[ExcludeScreenshots]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding ExcludeScreenshots, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <MenuItem Header="{Binding Text[MoodSafe]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding FamilySafeMode, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <Separator />
+                        <MenuItem Header="{Binding Text[IdleAutoPlaySetting]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding IdleAutoPlay, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                        <MenuItem Header="{Binding Text[AutoStartWindows]}"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding AutoStartWithWindows, Mode=TwoWay}"
+                                  StaysOpenOnClick="True" />
+                    </MenuItem>
+
+                    <MenuItem Header="{Binding Text[MenuHelp]}">
+                        <MenuItem Header="{Binding Text[CheckForUpdates]}"
+                                  Command="{Binding CheckForUpdatesCommand}" />
+                    </MenuItem>
+                </Menu>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="{DynamicResource SidebarBrush}"
+                    BorderBrush="{DynamicResource ChromeBorderBrush}"
+                    BorderThickness="0,0,1,0"
+                    Padding="26">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Top">
+                        <Button Content="{Binding Text[AddFolder]}"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding AddFolderCommand}" />
+                        <Button Content="{Binding Text[PlayAll]}"
+                                Command="{Binding PlayAllCommand}" />
+                        <Button Content="{Binding Text[ResumePrevious]}"
+                                Command="{Binding PlayAllCommand}" />
+                        <Button Content="{Binding Text[FavoritesOnly]}"
+                                Command="{Binding PlayFavoritesCommand}" />
+                        <Button Content="{Binding Text[WatchLater]}"
+                                Command="{Binding PlayWatchLaterCommand}" />
+                        <Button Content="{Binding Text[RecentlyUnseen]}"
+                                Command="{Binding PlayRecentlyUnseenCommand}" />
+                    </StackPanel>
+
+                    <StackPanel DockPanel.Dock="Bottom">
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding ScanStatus}"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <ScrollViewer Grid.Column="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto">
+                <StackPanel Margin="32,28,36,36">
+                    <TextBlock Text="{Binding Text[RegisteredFolders]}"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,12" />
+                    <TextBlock Text="{Binding Text[NoFoldersHint]}"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               Visibility="{Binding HasFolders, Converter={StaticResource InverseBoolToVis}}"
+                               Margin="0,0,0,12" />
+
+                    <ItemsControl ItemsSource="{Binding Folders}"
+                                  Margin="0,0,0,28">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="300"
+                                        MinHeight="150"
+                                        Background="{DynamicResource PanelBrush}"
+                                        BorderBrush="{DynamicResource PanelBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="18"
+                                        Margin="0,0,16,16">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="18"
+                                                   FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Path}"
+                                                   Foreground="{DynamicResource MutedTextBrush}"
+                                                   FontSize="12"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Margin="0,5,0,10" />
+                                        <TextBlock Foreground="{DynamicResource MutedTextBrush}"
+                                                   FontSize="12"
+                                                   Margin="0,0,0,10">
+                                            <Run Text="{Binding DataContext.Text[SubfoldersLabel], RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                            <Run Text="{Binding IncludeSubfolders, Mode=OneWay}" />
+                                            <Run Text="{Binding DataContext.Text[PrivateLabel], RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                            <Run Text="{Binding IsPrivate, Mode=OneWay}" />
+                                        </TextBlock>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{Binding DataContext.Text[Play], RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    Width="120"
+                                                    Style="{StaticResource PrimaryButton}"
+                                                    Command="{Binding DataContext.PlayFolderCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Content="{Binding DataContext.Text[Delete], RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    Width="90"
+                                                    Margin="8,4,0,4"
+                                                    Command="{Binding DataContext.DeleteFolderCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Grid Margin="0,0,0,28">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Text[Playlists]}"
+                                   FontSize="22"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
+                        <Button Grid.Column="1"
+                                Content="{Binding Text[CreatePlaylist]}"
+                                HorizontalAlignment="Left"
+                                Margin="16,0,0,0"
+                                Command="{Binding CreatePlaylistCommand}" />
+                    </Grid>
+                    <TextBlock Text="{Binding Text[PlaylistHelp]}"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               Visibility="{Binding HasPlaylists, Converter={StaticResource InverseBoolToVis}}"
+                               Margin="0,-18,0,12" />
+                    <ItemsControl ItemsSource="{Binding Playlists}"
+                                  Margin="0,0,0,28">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="300"
+                                        MinHeight="126"
+                                        Background="{DynamicResource PanelBrush}"
+                                        BorderBrush="{DynamicResource PanelBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="18"
+                                        Margin="0,0,16,16">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="18"
+                                                   FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Foreground="{DynamicResource MutedTextBrush}"
+                                                   FontSize="12"
+                                                   Margin="0,5,0,10">
+                                            <Run Text="{Binding DataContext.Text[FolderCountPrefix], RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                            <Run Text=" " />
+                                            <Run Text="{Binding FolderCount, Mode=OneWay}" />
+                                            <Run Text=" " />
+                                            <Run Text="{Binding DataContext.Text[FolderCountSuffix], RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                        </TextBlock>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{Binding DataContext.Text[Play], RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    Width="120"
+                                                    Style="{StaticResource PrimaryButton}"
+                                                    Command="{Binding DataContext.PlayPlaylistCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Content="{Binding DataContext.Text[Delete], RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    Width="90"
+                                                    Margin="8,4,0,4"
+                                                    Command="{Binding DataContext.DeletePlaylistCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Grid Margin="0,0,0,28">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Background="{DynamicResource PanelBrush}"
+                                BorderBrush="{DynamicResource PanelBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18"
+                                Margin="0,0,14,0">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Text[MenuMood]}"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,8" />
+                                <CheckBox Content="{Binding Text[MoodDefault]}"
+                                          IsChecked="{Binding IsDefaultMoodSelected, Mode=OneWay}"
+                                          Command="{Binding ApplyMoodCommand}"
+                                          CommandParameter="Default" />
+                                <CheckBox Content="{Binding Text[MoodWork]}"
+                                          IsChecked="{Binding IsWorkMoodSelected, Mode=OneWay}"
+                                          Command="{Binding ApplyMoodCommand}"
+                                          CommandParameter="Work" />
+                                <CheckBox Content="{Binding Text[MoodBedtime]}"
+                                          IsChecked="{Binding IsBedtimeMoodSelected, Mode=OneWay}"
+                                          Command="{Binding ApplyMoodCommand}"
+                                          CommandParameter="Bedtime" />
+                                <CheckBox Content="{Binding Text[MoodSafe]}"
+                                          IsChecked="{Binding IsFamilySafeMoodSelected, Mode=OneWay}"
+                                          Command="{Binding ApplyMoodCommand}"
+                                          CommandParameter="FamilySafe" />
+                                <Button Content="{Binding Text[CreateCustom]}"
+                                        Margin="0,12,0,4"
+                                        Command="{Binding CreateCustomMoodCommand}" />
+                                <ItemsControl ItemsSource="{Binding CustomMoodMenuItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,4,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox Content="{Binding Header}"
+                                                          IsChecked="{Binding IsChecked, Mode=OneWay}"
+                                                          VerticalAlignment="Center"
+                                                          Command="{Binding Command}"
+                                                          CommandParameter="{Binding Parameter}" />
+                                                <Button Grid.Column="1"
+                                                        Content="{Binding DataContext.Text[Delete], RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        MinWidth="58"
+                                                        Margin="6,4,0,4"
+                                                        Command="{Binding DataContext.DeleteCustomMoodCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding Parameter}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Background="{DynamicResource PanelBrush}"
+                                BorderBrush="{DynamicResource PanelBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18"
+                                Margin="0,0,14,0">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Text[Playback]}"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,8" />
+                                <CheckBox Content="{Binding Text[SmartShuffle]}"
+                                          IsChecked="{Binding UseSmartShuffle}" />
+                                <CheckBox Content="{Binding Text[Loop]}"
+                                          IsChecked="{Binding Loop}" />
+                                <CheckBox Content="{Binding Text[PauseEachPhoto]}"
+                                          IsChecked="{Binding PauseEachPhoto}" />
+                                <CheckBox Content="{Binding Text[IncludeVideos]}"
+                                          IsChecked="{Binding IncludeVideos}" />
+                                <CheckBox Content="{Binding Text[ExcludeScreenshots]}"
+                                          IsChecked="{Binding ExcludeScreenshots}" />
+                                <CheckBox Content="{Binding Text[MoodSafe]}"
+                                          IsChecked="{Binding FamilySafeMode}" />
+                                <ComboBox ItemsSource="{Binding VerticalBiasOptions}"
+                                          SelectedItem="{Binding SelectedVerticalBiasOption, Mode=TwoWay}"
+                                          Margin="0,8,0,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Label}"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                Background="{DynamicResource PanelBrush}"
+                                BorderBrush="{DynamicResource PanelBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Text[DisplayAndWindow]}"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,8" />
+                                <ComboBox ItemsSource="{Binding FitModeOptions}"
+                                          SelectedItem="{Binding SelectedFitModeOption, Mode=TwoWay}"
+                                          Margin="0,0,0,8">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Label}"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <ComboBox ItemsSource="{Binding Monitors}"
+                                          SelectedValuePath="DeviceName"
+                                          SelectedValue="{Binding SelectedMonitorDeviceName}"
+                                          Margin="0,0,0,8">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <CheckBox Content="{Binding Text[StartFullscreen]}"
+                                          IsChecked="{Binding StartSlideshowFullscreen}" />
+                                <CheckBox Content="{Binding Text[Topmost]}"
+                                          IsChecked="{Binding TopmostMode}" />
+                                <CheckBox Content="{Binding Text[AutoStartWindows]}"
+                                          IsChecked="{Binding AutoStartWithWindows}" />
+                                <CheckBox Content="{Binding Text[IdleAutoPlaySetting]}"
+                                          IsChecked="{Binding IdleAutoPlay}" />
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0,2,0,0">
+                                    <TextBlock Text="{Binding Text[WaitTime]}"
+                                               Foreground="{DynamicResource MutedTextBrush}"
+                                               VerticalAlignment="Center" />
+                                    <TextBox Width="54"
+                                             Margin="8,0,6,0"
+                                             Text="{Binding IdleAutoPlayMinutes, UpdateSourceTrigger=LostFocus}" />
+                                    <TextBlock Text="{Binding Text[Minutes]}"
+                                               Foreground="{DynamicResource MutedTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                                <CheckBox Content="{Binding Text[HideFromTaskbarQuiet]}"
+                                          IsChecked="{Binding HideFromTaskbarInQuietMode}" />
+                                <TextBlock Text="{Binding Text[Brightness]}"
+                                           Foreground="{DynamicResource MutedTextBrush}"
+                                           Margin="0,8,0,0" />
+                                <Slider Minimum="0.35"
+                                        Maximum="1"
+                                        TickFrequency="0.05"
+                                        Value="{Binding WindowOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Background="{DynamicResource PanelBrush}"
+                            BorderBrush="{DynamicResource PanelBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding Text[Speed]}"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,8" />
+                                <ItemsControl ItemsSource="{Binding SpeedOptions}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Content="{Binding Label}"
+                                                    MinWidth="72"
+                                                    Margin="0,0,8,8"
+                                                    Command="{Binding DataContext.SetSpeedCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Width="92"
+                                             Text="{Binding CustomSecondsText, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button Content="{Binding Text[CustomSeconds]}"
+                                            Margin="8,0,0,0"
+                                            Command="{Binding SetSpeedCommand}" />
+                                    <TextBlock Text="{Binding CurrentSlideSecondsText}"
+                                               Foreground="{DynamicResource MutedTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="14,0,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding Text[Organization]}"
+                                           FontWeight="SemiBold"
+                                           FontSize="18"
+                                           Margin="0,0,0,8" />
+                                <Button Content="{Binding Text[ReloadAll]}"
+                                        Command="{Binding ScanAllCommand}" />
+                                <Button Content="{Binding Text[MoveDeleteCandidatesToRecycleBin]}"
+                                        Command="{Binding PurgeDeleteCandidatesCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+                </Grid>
+            </DockPanel>
+        </Grid>
+
+        <Grid Background="#050505"
+              MouseLeftButtonDown="PlayerSurface_MouseLeftButtonDown"
+              Visibility="{Binding IsPlayerVisible, Converter={StaticResource BoolToVis}}">
+            <Image Source="{Binding CurrentImage}"
+                   Stretch="UniformToFill"
+                   Opacity="0.28"
+                   Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Image}">
+                <Image.Effect>
+                    <BlurEffect Radius="26" />
+                </Image.Effect>
+            </Image>
+            <Rectangle Fill="#050505"
+                       Opacity="0.35" />
+
+            <Image Source="{Binding CurrentImage}"
+                   Stretch="{Binding CurrentFitMode, Converter={StaticResource FitModeToStretch}}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   SnapsToDevicePixels="True"
+                   Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Image}" />
+
+            <MediaElement x:Name="VideoPlayer"
+                          LoadedBehavior="Manual"
+                          UnloadedBehavior="Manual"
+                          Stretch="{Binding CurrentFitMode, Converter={StaticResource FitModeToStretch}}"
+                          MediaEnded="VideoPlayer_MediaEnded"
+                          Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Video}" />
+
+            <Grid Visibility="{Binding IsOverlayVisible, Converter={StaticResource BoolToVis}}">
+                <Border VerticalAlignment="Top"
+                        Background="#CC0F1720"
+                        Padding="22,16"
+                        Tag="NoWindowDrag">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Left">
+                            <TextBlock Text="{Binding ActiveTitle}"
+                                       Foreground="White"
+                                       FontSize="18"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding CurrentMetaText}"
+                                       Foreground="#CFD8E3"
+                                       FontSize="13" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Right"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <TextBlock Text="{Binding Text[DeleteCandidate]}"
+                                       Foreground="#FECACA"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,16,0"
+                                       Visibility="{Binding CurrentIsDeleteCandidate, Converter={StaticResource BoolToVis}}" />
+                            <TextBlock Text="{Binding CurrentIndex, StringFormat={}{0:N0}}"
+                                       Foreground="White" />
+                            <TextBlock Text=" / "
+                                       Foreground="#CFD8E3" />
+                            <TextBlock Text="{Binding TotalItems, StringFormat={}{0:N0}}"
+                                       Foreground="White" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <Border VerticalAlignment="Bottom"
+                        Background="#CC0F1720"
+                        Padding="22,14"
+                        Tag="NoWindowDrag">
+                    <WrapPanel HorizontalAlignment="Center">
+                        <Button Content="←"
+                                MinWidth="52"
+                                Command="{Binding PreviousCommand}" />
+                        <Button Content="{Binding PlayPauseText}"
+                                MinWidth="92"
+                                Margin="8,4"
+                                Command="{Binding TogglePauseCommand}" />
+                        <Button Content="→"
+                                MinWidth="52"
+                                Command="{Binding NextCommand}" />
+                        <Button Content="{Binding Text[First]}"
+                                MinWidth="74"
+                                Margin="8,4"
+                                Command="{Binding FirstCommand}" />
+                        <Button Content="{Binding CurrentIsFavorite, Converter={StaticResource FavoriteGlyph}}"
+                                MinWidth="52"
+                                Command="{Binding ToggleFavoriteCommand}" />
+                        <Button Content="{Binding HideButtonText}"
+                                MinWidth="96"
+                                Margin="8,4"
+                                Command="{Binding HideCurrentCommand}" />
+                        <Button Content="{Binding WatchLaterButtonText}"
+                                MinWidth="118"
+                                Command="{Binding WatchLaterCommand}" />
+                        <Button Content="{Binding DeleteCandidateButtonText}"
+                                MinWidth="92"
+                                Margin="8,4"
+                                Command="{Binding DeleteCandidateCommand}" />
+                        <Button Content="{Binding Text[Fullscreen]}"
+                                MinWidth="78"
+                                Command="{Binding ToggleFullscreenCommand}" />
+                        <Button Content="{Binding Text[BorderlessWindow]}"
+                                MinWidth="78"
+                                Margin="8,4"
+                                Command="{Binding ToggleBorderlessCommand}" />
+                        <Button Content="{Binding Text[Home]}"
+                                MinWidth="78"
+                                Command="{Binding BackHomeCommand}" />
+                    </WrapPanel>
+                </Border>
+            </Grid>
+
+        </Grid>
+    </Grid>
+</Window>

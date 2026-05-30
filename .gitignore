@@ -1,0 +1,35 @@
+# IDE and local tooling
+.vs/
+.vscode/
+.idea/
+.dotnet-sdk/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build and test output
+bin/
+obj/
+TestResults/
+artifacts/
+publish/
+
+# Local app data and databases
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.log
+
+# Local package output
+*.nupkg
+*.snupkg
+*.msix
+*.appx
+
+# OS noise
+Thumbs.db
+Desktop.ini

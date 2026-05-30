@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\EverydaySlideshow.Core\EverydaySlideshow.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Version>0.1.0</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <RepositoryOwner>TTmarch</RepositoryOwner>
+    <RepositoryName>EverydaySlideshow</RepositoryName>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="RepositoryOwner" Value="$(RepositoryOwner)" />
+    <AssemblyMetadata Include="RepositoryName" Value="$(RepositoryName)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\app.ico" />
+    <None Remove="Assets\app-icon.png" />
+    <Resource Include="Assets\app.ico" />
+    <None Include="Assets\app-icon.png" />
+  </ItemGroup>
+
+</Project>
