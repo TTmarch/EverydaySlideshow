@@ -117,5 +117,8 @@ public sealed class CustomMoodDialog : Window
 
     public CustomMoodProfile? Result { get; private set; }
 
-    private sealed record BiasChoice(string Label, VerticalPhotoBias Value);
+    private sealed record BiasChoice(string Label, VerticalPhotoBias Value)
+    {
+        public override string ToString() => Label;
+    }
 }

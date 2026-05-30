@@ -283,8 +283,9 @@
                                               Margin="{TemplateBinding Padding}"
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Left"
-                                              Content="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
-                                              ContentTemplate="{TemplateBinding ItemTemplate}"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
                                               TextElement.Foreground="{DynamicResource TextBrush}" />
 
                             <Popup x:Name="PART_Popup"
