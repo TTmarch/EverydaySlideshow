@@ -222,10 +222,6 @@
                                   IsCheckable="True"
                                   IsChecked="{Binding MuteVideo, Mode=TwoWay}"
                                   StaysOpenOnClick="True" />
-                        <MenuItem Header="{Binding Text[ExcludeScreenshots]}"
-                                  IsCheckable="True"
-                                  IsChecked="{Binding ExcludeScreenshots, Mode=TwoWay}"
-                                  StaysOpenOnClick="True" />
                         <MenuItem Header="{Binding Text[MoodSafe]}"
                                   IsCheckable="True"
                                   IsChecked="{Binding FamilySafeMode, Mode=TwoWay}"
@@ -505,8 +501,6 @@
                                           IsChecked="{Binding PauseEachPhoto}" />
                                 <CheckBox Content="{Binding Text[IncludeVideos]}"
                                           IsChecked="{Binding IncludeVideos}" />
-                                <CheckBox Content="{Binding Text[ExcludeScreenshots]}"
-                                          IsChecked="{Binding ExcludeScreenshots}" />
                                 <CheckBox Content="{Binding Text[MoodSafe]}"
                                           IsChecked="{Binding FamilySafeMode}" />
                                 <ComboBox ItemsSource="{Binding VerticalBiasOptions}"

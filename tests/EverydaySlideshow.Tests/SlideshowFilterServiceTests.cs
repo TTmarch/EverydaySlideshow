@@ -5,7 +5,7 @@ namespace EverydaySlideshow.Tests;
 public sealed class SlideshowFilterServiceTests
 {
     [Fact]
-    public void Apply_removes_hidden_delete_candidates_screenshots_and_videos()
+    public void Apply_keeps_screenshots_while_removing_hidden_delete_candidates_and_videos()
     {
         var now = new DateTimeOffset(2026, 5, 30, 12, 0, 0, TimeSpan.Zero);
         var items = new[]
@@ -20,12 +20,10 @@ public sealed class SlideshowFilterServiceTests
         var filtered = SlideshowFilterService.Apply(items, new SlideshowFilterOptions
         {
             IncludeVideos = false,
-            ExcludeScreenshots = true,
             Now = now
         });
 
-        Assert.Single(filtered);
-        Assert.Equal("keep.jpg", filtered[0].FileName);
+        Assert.Equal(["keep.jpg", "Screenshot_01.png"], filtered.Select(item => item.FileName));
     }
 
     [Fact]
@@ -46,7 +44,6 @@ public sealed class SlideshowFilterServiceTests
             AnniversaryAroundTodayOnly = true,
             RecentlyUnseenDays = 60,
             AnniversaryWindowDays = 3,
-            ExcludeScreenshots = false,
             Now = now
         });
 
@@ -66,8 +63,7 @@ public sealed class SlideshowFilterServiceTests
 
         var filtered = SlideshowFilterService.Apply(items, new SlideshowFilterOptions
         {
-            FamilySafeMode = true,
-            ExcludeScreenshots = false
+            FamilySafeMode = true
         });
 
         Assert.Single(filtered);
@@ -86,8 +82,7 @@ public sealed class SlideshowFilterServiceTests
 
         var filtered = SlideshowFilterService.Apply(items, new SlideshowFilterOptions
         {
-            WatchLaterOnly = true,
-            ExcludeScreenshots = false
+            WatchLaterOnly = true
         });
 
         Assert.Single(filtered);
@@ -106,8 +101,7 @@ public sealed class SlideshowFilterServiceTests
         var filtered = SlideshowFilterService.Apply(items, new SlideshowFilterOptions
         {
             WatchLaterOnly = true,
-            FamilySafeMode = true,
-            ExcludeScreenshots = false
+            FamilySafeMode = true
         });
 
         Assert.Single(filtered);

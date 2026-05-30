@@ -2,12 +2,6 @@ namespace EverydaySlideshow.Core;
 
 public static class SlideshowFilterService
 {
-    private static readonly string[] ScreenshotTokens =
-    [
-        "screenshot", "screen shot", "スクリーンショット", "画面収録", "画面キャプチャ",
-        "snipping", "capture"
-    ];
-
     public static IReadOnlyList<MediaItem> Apply(IEnumerable<MediaItem> items, SlideshowFilterOptions options)
     {
         var query = items.Where(item =>
@@ -36,13 +30,7 @@ public static class SlideshowFilterService
         {
             query = query.Where(item =>
                 !item.IsFromPrivateFolder
-                && !IsLikelyScreenshot(item)
                 && (options.WatchLaterOnly || !item.IsWatchLater));
-        }
-
-        if (options.ExcludeScreenshots)
-        {
-            query = query.Where(item => !IsLikelyScreenshot(item));
         }
 
         if (options.RecentlyUnseenOnly)
@@ -61,12 +49,6 @@ public static class SlideshowFilterService
             .ThenBy(item => item.SortDate)
             .ThenBy(item => item.Path, StringComparer.OrdinalIgnoreCase)
             .ToList();
-    }
-
-    public static bool IsLikelyScreenshot(MediaItem item)
-    {
-        var haystack = $"{item.FileName} {item.FolderName}".ToLowerInvariant();
-        return ScreenshotTokens.Any(token => haystack.Contains(token, StringComparison.OrdinalIgnoreCase));
     }
 
     public static bool IsNearAnniversary(DateTimeOffset date, DateTimeOffset now, int windowDays)

@@ -99,7 +99,6 @@ public sealed class SlideshowFilterOptions
     public bool WatchLaterOnly { get; set; }
     public bool RecentlyUnseenOnly { get; set; }
     public bool AnniversaryAroundTodayOnly { get; set; }
-    public bool ExcludeScreenshots { get; set; } = true;
     public bool IncludeVideos { get; set; } = true;
     public bool FamilySafeMode { get; set; }
     public VerticalPhotoBias VerticalBias { get; set; } = VerticalPhotoBias.Normal;
@@ -150,7 +149,6 @@ public sealed class CustomMoodProfile
     public double Opacity { get; set; } = 1.0;
     public bool MuteVideo { get; set; }
     public bool IncludeVideos { get; set; } = true;
-    public bool ExcludeScreenshots { get; set; } = true;
     public bool FamilySafeMode { get; set; }
     public VerticalPhotoBias VerticalBias { get; set; } = VerticalPhotoBias.Normal;
     public DateTimeOffset CreatedUtc { get; set; } = DateTimeOffset.UtcNow;

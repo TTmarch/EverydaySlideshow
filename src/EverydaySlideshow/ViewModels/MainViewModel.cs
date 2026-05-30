@@ -93,7 +93,6 @@ public sealed class MainViewModel : ObservableObject
         {
             options.WatchLaterOnly = true;
             options.FamilySafeMode = false;
-            options.ExcludeScreenshots = false;
             options.IncludeVideos = true;
         }));
         PlayRecentlyUnseenCommand = new AsyncRelayCommand(() => StartPlaybackAsync(null, T("RecentlyUnseen"), options => options.RecentlyUnseenOnly = true));
@@ -477,22 +476,6 @@ public sealed class MainViewModel : ObservableObject
             }
 
             FilterOptions.IncludeVideos = value;
-            OnPropertyChanged();
-            _ = SaveSettingsAsync();
-        }
-    }
-
-    public bool ExcludeScreenshots
-    {
-        get => FilterOptions.ExcludeScreenshots;
-        set
-        {
-            if (FilterOptions.ExcludeScreenshots == value)
-            {
-                return;
-            }
-
-            FilterOptions.ExcludeScreenshots = value;
             OnPropertyChanged();
             _ = SaveSettingsAsync();
         }
@@ -1278,7 +1261,6 @@ public sealed class MainViewModel : ObservableObject
                 WindowOpacity = 0.86;
                 MuteVideo = true;
                 IncludeVideos = true;
-                ExcludeScreenshots = true;
                 FamilySafeMode = false;
                 StatusMessage = T("MoodWorkSelected");
                 break;
@@ -1287,7 +1269,6 @@ public sealed class MainViewModel : ObservableObject
                 WindowOpacity = 0.72;
                 MuteVideo = true;
                 IncludeVideos = true;
-                ExcludeScreenshots = true;
                 FamilySafeMode = false;
                 StatusMessage = T("MoodBedtimeSelected");
                 break;
@@ -1296,7 +1277,6 @@ public sealed class MainViewModel : ObservableObject
                 WindowOpacity = 1.0;
                 MuteVideo = true;
                 IncludeVideos = true;
-                ExcludeScreenshots = true;
                 FamilySafeMode = true;
                 CurrentVerticalBias = VerticalPhotoBias.Normal;
                 StatusMessage = T("MoodSafeSelected");
@@ -1306,7 +1286,6 @@ public sealed class MainViewModel : ObservableObject
                 WindowOpacity = 1.0;
                 MuteVideo = false;
                 IncludeVideos = true;
-                ExcludeScreenshots = true;
                 FamilySafeMode = false;
                 CurrentVerticalBias = VerticalPhotoBias.Normal;
                 StatusMessage = T("MoodDefaultSelected");
@@ -1331,7 +1310,6 @@ public sealed class MainViewModel : ObservableObject
             Opacity = WindowOpacity,
             MuteVideo = MuteVideo,
             IncludeVideos = IncludeVideos,
-            ExcludeScreenshots = ExcludeScreenshots,
             FamilySafeMode = FamilySafeMode,
             VerticalBias = CurrentVerticalBias
         };
@@ -1370,7 +1348,6 @@ public sealed class MainViewModel : ObservableObject
         WindowOpacity = profile.Opacity;
         MuteVideo = profile.MuteVideo;
         IncludeVideos = profile.IncludeVideos;
-        ExcludeScreenshots = profile.ExcludeScreenshots;
         FamilySafeMode = profile.FamilySafeMode;
         CurrentVerticalBias = profile.VerticalBias;
         StatusMessage = F("StatusCustomMoodSelected", profile.Name);
@@ -1836,7 +1813,6 @@ public sealed class MainViewModel : ObservableObject
             WatchLaterOnly = FilterOptions.WatchLaterOnly,
             RecentlyUnseenOnly = FilterOptions.RecentlyUnseenOnly,
             AnniversaryAroundTodayOnly = FilterOptions.AnniversaryAroundTodayOnly,
-            ExcludeScreenshots = FilterOptions.ExcludeScreenshots,
             IncludeVideos = FilterOptions.IncludeVideos,
             FamilySafeMode = FilterOptions.FamilySafeMode,
             VerticalBias = FilterOptions.VerticalBias,
@@ -1914,7 +1890,6 @@ public sealed class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(PauseEachPhoto));
         OnPropertyChanged(nameof(UseSmartShuffle));
         OnPropertyChanged(nameof(IncludeVideos));
-        OnPropertyChanged(nameof(ExcludeScreenshots));
         OnPropertyChanged(nameof(FamilySafeMode));
         OnPropertyChanged(nameof(CurrentVerticalBias));
         OnPropertyChanged(nameof(SelectedVerticalBiasOption));

@@ -17,7 +17,6 @@ public sealed class CustomMoodDialog : Window
     private readonly TextBox _opacityBox;
     private readonly CheckBox _muteBox;
     private readonly CheckBox _includeVideosBox;
-    private readonly CheckBox _excludeScreenshotsBox;
     private readonly CheckBox _familySafeBox;
     private readonly ComboBox _verticalBiasBox;
 
@@ -35,7 +34,6 @@ public sealed class CustomMoodDialog : Window
         _opacityBox = new TextBox { Text = draft.Opacity.ToString("0.00"), Margin = new Thickness(0, 4, 0, 12) };
         _muteBox = new CheckBox { Content = LocalizedText.Translate(language, "MuteVideoDialog"), IsChecked = draft.MuteVideo };
         _includeVideosBox = new CheckBox { Content = LocalizedText.Translate(language, "IncludeVideos"), IsChecked = draft.IncludeVideos };
-        _excludeScreenshotsBox = new CheckBox { Content = LocalizedText.Translate(language, "ExcludeScreenshots"), IsChecked = draft.ExcludeScreenshots };
         _familySafeBox = new CheckBox { Content = LocalizedText.Translate(language, "MoodSafe"), IsChecked = draft.FamilySafeMode };
         _verticalBiasBox = new ComboBox
         {
@@ -79,7 +77,6 @@ public sealed class CustomMoodDialog : Window
                 Opacity = Math.Clamp(opacity, 0.35, 1.0),
                 MuteVideo = _muteBox.IsChecked == true,
                 IncludeVideos = _includeVideosBox.IsChecked == true,
-                ExcludeScreenshots = _excludeScreenshotsBox.IsChecked == true,
                 FamilySafeMode = _familySafeBox.IsChecked == true,
                 VerticalBias = _verticalBiasBox.SelectedValue is VerticalPhotoBias bias ? bias : VerticalPhotoBias.Normal
             };
@@ -113,7 +110,6 @@ public sealed class CustomMoodDialog : Window
         panel.Children.Add(_verticalBiasBox);
         panel.Children.Add(_muteBox);
         panel.Children.Add(_includeVideosBox);
-        panel.Children.Add(_excludeScreenshotsBox);
         panel.Children.Add(_familySafeBox);
         panel.Children.Add(buttons);
         Content = panel;
