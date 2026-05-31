@@ -42,6 +42,7 @@ public sealed class MainViewModel : ObservableObject
     private const string FilterSettingsKey = "filter-settings";
     private const string ResumeStateKey = "resume-state";
     private const string CustomMoodProfilesKey = "custom-mood-profiles";
+    private const int ImageTransitionMilliseconds = 320;
 
     private readonly SqliteAppDatabase _database;
     private readonly MediaScanner _scanner = new();
@@ -72,6 +73,7 @@ public sealed class MainViewModel : ObservableObject
     private string _scanStatus = "";
     private string _activeTitle = LocalizedText.Translate(AppLanguage.English, "PlayAll");
     private string _customSecondsText = "15";
+    private int _imageTransitionVersion;
     private int _totalItems;
     private int _currentIndex;
 
@@ -1488,8 +1490,7 @@ public sealed class MainViewModel : ObservableObject
         IsCurrentVideo = item.IsVideo;
         if (item.IsVideo)
         {
-            PreviousImage = null;
-            CurrentImage = null;
+            ClearDisplayedImages();
         }
         await _database.RecordPlaybackAsync(item.Path, item.FolderId, completed: false);
         await _database.SaveSettingAsync(ResumeStateKey, new PlaybackResumeState
@@ -1518,6 +1519,7 @@ public sealed class MainViewModel : ObservableObject
 
             PreviousImage = CurrentImage;
             CurrentImage = result.Source;
+            SchedulePreviousImageClear(item.Path);
             item.Width = result.Width;
             item.Height = result.Height;
             item.CapturedUtc ??= result.CapturedUtc;
@@ -1811,11 +1813,34 @@ public sealed class MainViewModel : ObservableObject
     {
         IsPlaying = false;
         IsPlayerVisible = false;
-        PreviousImage = null;
-        CurrentImage = null;
+        ClearDisplayedImages();
         _slideTimer.Stop();
         _imageLoadCts?.Cancel();
         RestorePlaybackStartDisplayMode();
+    }
+
+    private void ClearDisplayedImages()
+    {
+        _imageTransitionVersion++;
+        PreviousImage = null;
+        CurrentImage = null;
+    }
+
+    private void SchedulePreviousImageClear(string mediaPath)
+    {
+        var version = ++_imageTransitionVersion;
+        _ = ClearPreviousImageAfterTransitionAsync(version, mediaPath);
+    }
+
+    private async Task ClearPreviousImageAfterTransitionAsync(int version, string mediaPath)
+    {
+        await Task.Delay(ImageTransitionMilliseconds);
+        if (version == _imageTransitionVersion
+            && CurrentItem?.IsImage == true
+            && string.Equals(CurrentItem.Path, mediaPath, StringComparison.OrdinalIgnoreCase))
+        {
+            PreviousImage = null;
+        }
     }
 
     private SlideshowFilterOptions CopyFilterOptions()
