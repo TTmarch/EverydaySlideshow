@@ -1,6 +1,6 @@
 #define AppName "Everyday Slideshow"
 #ifndef AppVersion
-#define AppVersion "0.1.3"
+#define AppVersion "0.1.4"
 #endif
 #ifndef SourceDir
 #define SourceDir "..\artifacts\publish\portable-win-x64"
@@ -12,7 +12,7 @@
 #define OutputDir "..\artifacts\release"
 #endif
 #ifndef OutputBaseFilename
-#define OutputBaseFilename "EverydaySlideshow-0.1.3-setup-win-x64"
+#define OutputBaseFilename "EverydaySlideshow-0.1.4-setup-win-x64"
 #endif
 
 [Setup]

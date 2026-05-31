@@ -643,14 +643,6 @@
         <Grid Background="#050505"
               MouseLeftButtonDown="PlayerSurface_MouseLeftButtonDown"
               Visibility="{Binding IsPlayerVisible, Converter={StaticResource BoolToVis}}">
-            <Image Source="{Binding PreviousImage}"
-                   Stretch="UniformToFill"
-                   Opacity="0.28"
-                   Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Image}">
-                <Image.Effect>
-                    <BlurEffect Radius="26" />
-                </Image.Effect>
-            </Image>
             <Image Source="{Binding CurrentImage, NotifyOnTargetUpdated=True}"
                    Stretch="UniformToFill"
                    Opacity="0.28"
@@ -677,13 +669,6 @@
             </Image>
             <Rectangle Fill="#050505"
                        Opacity="0.35" />
-
-            <Image Source="{Binding PreviousImage}"
-                   Stretch="{Binding CurrentFitMode, Converter={StaticResource FitModeToStretch}}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   SnapsToDevicePixels="True"
-                   Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Image}" />
 
             <Image Source="{Binding CurrentImage, NotifyOnTargetUpdated=True}"
                    Stretch="{Binding CurrentFitMode, Converter={StaticResource FitModeToStretch}}"
