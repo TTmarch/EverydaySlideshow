@@ -42,6 +42,7 @@ public partial class MainWindow : Window
         _viewModel.DisplaySettingsChanged += ApplyDisplaySettings;
         _viewModel.LanguageChanged += RefreshLanguageSensitiveOptions;
         _viewModel.PlaybackVisualStateChanged += UpdateVideoPlayer;
+        _viewModel.PropertyChanged += MainViewModel_PropertyChanged;
 
         Loaded += MainWindow_Loaded;
         ContentRendered += MainWindow_ContentRendered;
@@ -171,7 +172,7 @@ public partial class MainWindow : Window
 
     private void ApplyDisplaySettings()
     {
-        var mode = _viewModel.DisplaySettings.DisplayMode;
+        var mode = GetEffectiveDisplayMode();
         ApplyTheme();
         Topmost = _viewModel.DisplaySettings.Topmost;
         Opacity = _viewModel.DisplaySettings.Opacity;
@@ -219,6 +220,14 @@ public partial class MainWindow : Window
         Height = screen.Bounds.Height;
         Topmost = _viewModel.DisplaySettings.Topmost;
         _appliedDisplayMode = mode;
+    }
+
+    private DisplayModeKind GetEffectiveDisplayMode()
+    {
+        var mode = _viewModel.DisplaySettings.DisplayMode;
+        return mode == DisplayModeKind.Borderless && !_viewModel.IsPlayerVisible
+            ? DisplayModeKind.Window
+            : mode;
     }
 
     private void ApplyTheme()
@@ -342,7 +351,7 @@ public partial class MainWindow : Window
         var left = double.IsFinite(settings.WindowLeft) ? settings.WindowLeft : Left;
         var top = double.IsFinite(settings.WindowTop) ? settings.WindowTop : Top;
         ApplyBounds(new Rect(left, top, width, height));
-        if (settings.WindowMaximized && settings.DisplayMode == DisplayModeKind.Window)
+        if (settings.WindowMaximized && GetEffectiveDisplayMode() == DisplayModeKind.Window)
         {
             WindowState = WindowState.Maximized;
         }
@@ -485,7 +494,7 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
             case Key.Escape:
-                if (_viewModel.DisplaySettings.DisplayMode != DisplayModeKind.Window)
+                if (GetEffectiveDisplayMode() != DisplayModeKind.Window)
                 {
                     _viewModel.SetWindowModeCommand.Execute(null);
                 }
@@ -505,14 +514,23 @@ public partial class MainWindow : Window
         _viewModel.RequestOpenUrl -= OpenExternalUrl;
         _viewModel.LanguageChanged -= RefreshLanguageSensitiveOptions;
         _viewModel.PlaybackVisualStateChanged -= UpdateVideoPlayer;
+        _viewModel.PropertyChanged -= MainViewModel_PropertyChanged;
         base.OnClosing(e);
+    }
+
+    private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.IsPlayerVisible))
+        {
+            ApplyDisplaySettings();
+        }
     }
 
     private void SaveWindowPlacement()
     {
         var bounds = WindowState == WindowState.Maximized
             ? RestoreBounds
-            : _viewModel.DisplaySettings.DisplayMode == DisplayModeKind.Fullscreen && _lastWindowedBounds.HasValue
+            : GetEffectiveDisplayMode() == DisplayModeKind.Fullscreen && _lastWindowedBounds.HasValue
                 ? _lastWindowedBounds.Value
                 : new Rect(Left, Top, ActualWidth > 0 ? ActualWidth : Width, ActualHeight > 0 ? ActualHeight : Height);
 
@@ -521,6 +539,6 @@ public partial class MainWindow : Window
             bounds.Top,
             bounds.Width,
             bounds.Height,
-            WindowState == WindowState.Maximized && _viewModel.DisplaySettings.DisplayMode == DisplayModeKind.Window);
+            WindowState == WindowState.Maximized && GetEffectiveDisplayMode() == DisplayModeKind.Window);
     }
 }
