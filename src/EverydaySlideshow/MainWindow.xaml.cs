@@ -225,7 +225,7 @@ public partial class MainWindow : Window
     private DisplayModeKind GetEffectiveDisplayMode()
     {
         var mode = _viewModel.DisplaySettings.DisplayMode;
-        return mode == DisplayModeKind.Borderless && !_viewModel.IsPlayerVisible
+        return mode != DisplayModeKind.Window && !_viewModel.IsPlayerVisible
             ? DisplayModeKind.Window
             : mode;
     }

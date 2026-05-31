@@ -13,7 +13,7 @@ Everyday Slideshow is a local-first Windows 11 desktop app for enjoying photos a
 - Speeds: 1s, 2s, 3s, 5s, 10s, 30s, 1 min, 5 min, and custom seconds.
 - Mixed photo/video playback. Videos advance after the media ends when Windows can play the format.
 - Mood modes: Default, Work, Bedtime, Safe Mode, and user-defined custom modes.
-- Window, fullscreen, borderless playback window, monitor selection, always-on-top, dark mode, brightness, quiet display, and restored window size.
+- Windowed home screen with fullscreen/borderless playback, monitor selection, always-on-top, dark mode, brightness, quiet display, and restored window size.
 - During playback, the menu is hidden and controls appear only when the mouse moves.
 - Mark favorites, hide/unhide, mark/unmark delete candidates, and add/remove Watch later.
 - Delete candidates are moved to the Windows Recycle Bin only after confirmation.

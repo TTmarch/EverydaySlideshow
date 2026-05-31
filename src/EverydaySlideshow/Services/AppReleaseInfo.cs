@@ -5,7 +5,7 @@ namespace EverydaySlideshow.Services;
 internal static class AppReleaseInfo
 {
     public static Version CurrentVersion { get; } =
-        Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 1, 0);
+        Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 1, 1);
 
     public static string RepositoryOwner { get; } = ReadMetadata("RepositoryOwner");
 
