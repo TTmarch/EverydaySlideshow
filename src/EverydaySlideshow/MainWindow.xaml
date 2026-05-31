@@ -643,7 +643,7 @@
         <Grid Background="#050505"
               MouseLeftButtonDown="PlayerSurface_MouseLeftButtonDown"
               Visibility="{Binding IsPlayerVisible, Converter={StaticResource BoolToVis}}">
-            <Image Source="{Binding CurrentImage}"
+            <Image Source="{Binding PreviousImage}"
                    Stretch="UniformToFill"
                    Opacity="0.28"
                    Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Image}">
@@ -651,15 +651,63 @@
                     <BlurEffect Radius="26" />
                 </Image.Effect>
             </Image>
+            <Image Source="{Binding CurrentImage, NotifyOnTargetUpdated=True}"
+                   Stretch="UniformToFill"
+                   Opacity="0.28"
+                   Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Image}">
+                <Image.Triggers>
+                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 From="0"
+                                                 To="0.28"
+                                                 Duration="0:0:0.24">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Image.Triggers>
+                <Image.Effect>
+                    <BlurEffect Radius="26" />
+                </Image.Effect>
+            </Image>
             <Rectangle Fill="#050505"
                        Opacity="0.35" />
 
-            <Image Source="{Binding CurrentImage}"
+            <Image Source="{Binding PreviousImage}"
                    Stretch="{Binding CurrentFitMode, Converter={StaticResource FitModeToStretch}}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    SnapsToDevicePixels="True"
                    Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Image}" />
+
+            <Image Source="{Binding CurrentImage, NotifyOnTargetUpdated=True}"
+                   Stretch="{Binding CurrentFitMode, Converter={StaticResource FitModeToStretch}}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   SnapsToDevicePixels="True"
+                   Visibility="{Binding IsCurrentVideo, Converter={StaticResource CurrentMediaVisibility}, ConverterParameter=Image}">
+                <Image.Triggers>
+                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 From="0"
+                                                 To="1"
+                                                 Duration="0:0:0.24">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Image.Triggers>
+            </Image>
 
             <MediaElement x:Name="VideoPlayer"
                           LoadedBehavior="Manual"

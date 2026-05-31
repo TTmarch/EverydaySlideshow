@@ -59,6 +59,7 @@ public sealed class MainViewModel : ObservableObject
     private Task? _initializeTask;
     private string _queueKey = "default";
     private MediaItem? _currentItem;
+    private ImageSource? _previousImage;
     private ImageSource? _currentImage;
     private bool _isPlayerVisible;
     private bool _isBusy;
@@ -251,6 +252,12 @@ public sealed class MainViewModel : ObservableObject
     {
         get => _currentImage;
         private set => SetProperty(ref _currentImage, value);
+    }
+
+    public ImageSource? PreviousImage
+    {
+        get => _previousImage;
+        private set => SetProperty(ref _previousImage, value);
     }
 
     public bool IsPlayerVisible
@@ -1479,7 +1486,11 @@ public sealed class MainViewModel : ObservableObject
         CurrentIndex = Math.Max(1, _playlist.FindIndex(candidate =>
             string.Equals(candidate.Path, item.Path, StringComparison.OrdinalIgnoreCase)) + 1);
         IsCurrentVideo = item.IsVideo;
-        CurrentImage = null;
+        if (item.IsVideo)
+        {
+            PreviousImage = null;
+            CurrentImage = null;
+        }
         await _database.RecordPlaybackAsync(item.Path, item.FolderId, completed: false);
         await _database.SaveSettingAsync(ResumeStateKey, new PlaybackResumeState
         {
@@ -1505,6 +1516,7 @@ public sealed class MainViewModel : ObservableObject
                 return;
             }
 
+            PreviousImage = CurrentImage;
             CurrentImage = result.Source;
             item.Width = result.Width;
             item.Height = result.Height;
@@ -1799,6 +1811,7 @@ public sealed class MainViewModel : ObservableObject
     {
         IsPlaying = false;
         IsPlayerVisible = false;
+        PreviousImage = null;
         CurrentImage = null;
         _slideTimer.Stop();
         _imageLoadCts?.Cancel();
